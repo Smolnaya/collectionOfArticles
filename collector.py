@@ -1,5 +1,7 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
+
 import xmlGenerator
 
 if __name__ == "__main__":
@@ -9,9 +11,9 @@ if __name__ == "__main__":
     driver.get(url)
     assert 'Новости' in driver.title
 
-    # for i in range(1):
-    #     html = driver.find_element_by_tag_name('html')
-    #     html.send_keys(Keys.END)
+    for i in range(10):
+        html = driver.find_element_by_tag_name('html')
+        html.send_keys(Keys.END)
 
     articleList = driver.find_elements_by_xpath('//article')
 
