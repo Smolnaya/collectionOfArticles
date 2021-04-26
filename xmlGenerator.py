@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as et
+import service
 
 
 def generateXml(title, date, author, text, tags, source):
@@ -7,7 +8,7 @@ def generateXml(title, date, author, text, tags, source):
     sourceElem = et.SubElement(root, 'source')
     sourceElem.text = source
 
-    categoryElem = et.SubElement(root, 'category')
+    # categoryElem = et.SubElement(root, 'category')
 
     authorElem = et.SubElement(root, 'author')
     authorElem.text = author
@@ -16,7 +17,7 @@ def generateXml(title, date, author, text, tags, source):
     titleElem.text = title
 
     dateElem = et.SubElement(root, 'date')
-    dateElem.text = date
+    dateElem.text = service.convertDate(date)
 
     tagsElem = et.SubElement(root, 'tags')
     tagsElem.text = ','.join(tags)
@@ -26,5 +27,5 @@ def generateXml(title, date, author, text, tags, source):
 
     tree = et.ElementTree(root)
 
-    with open(f'files/{title}.xml', "wb") as files:
-        tree.write(files)
+    with open(f'files/{service.titleToFileName(title)}.xml', "wb") as files:
+        tree.write(files, encoding='UTF-8', xml_declaration=True)
