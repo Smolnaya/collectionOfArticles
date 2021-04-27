@@ -2,22 +2,24 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
-import xmlGenerator
+from Article import Article
 
-if __name__ == "__main__":
+
+def collectArticles(articleNumber):
     url = 'https://the-geek.ru/category/news'
     driver = webdriver.Chrome()
     driver.implicitly_wait(10)
     driver.get(url)
     assert 'Новости' in driver.title
 
-    for i in range(10):
+    articleElem = list()
+    articleList = list()
+    while len(articleElem) < articleNumber:
         html = driver.find_element_by_tag_name('html')
         html.send_keys(Keys.END)
+        articleElem = driver.find_elements_by_xpath('//article')
 
-    articleList = driver.find_elements_by_xpath('//article')
-
-    for article in articleList:
+    for article in articleElem:
         href = driver.find_element_by_xpath(
             f"//article[@id='{article.get_attribute('id')}']/a").get_attribute('href')
         driver.execute_script(f"window.open('{href}', 'new_window')")
@@ -39,11 +41,10 @@ if __name__ == "__main__":
         except NoSuchElementException:
             pass
 
-        # print(title, date, author, text.strip(), tags.strip(), source, sep='\n*\n', end='\n_____\n')
-
-        xmlGenerator.generateXml(title, date, author, text.strip(), tags.strip(), source)
+        articleList.append(Article(title, date, author, text.strip(), tags.strip(), source))
 
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
 
     driver.close()
+    return articleList
