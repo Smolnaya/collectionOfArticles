@@ -3,7 +3,7 @@ import re
 
 
 def titleToFileName(value):
-    return re.sub(r'\W', '', value)
+    return re.sub(r'[^а-яА-Яa-zA-Z0-9_\s]', '', value)
 
 
 def convertDate(value):

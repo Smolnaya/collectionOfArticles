@@ -1,6 +1,5 @@
 import time
 import collector
-import xmlGenerator
 import datetime
 import os
 
@@ -9,18 +8,14 @@ if __name__ == "__main__":
 
     # Количество потоков в THREAD_QUANTITY (collector.py)
 
-    # Количество статей
-    articleList = collector.getArticles(100)
-
-    print('collectArticles ----   %s  ----',
-          str(datetime.timedelta(seconds=(time.time() - start_time))))
-    start_time2 = time.time()
-
     # Создать файлы xml в папке 'files'
-    for article in articleList:
-        xmlGenerator.generateXml(article)
+    if not os.path.isdir('files'):
+        os.mkdir('files')
 
-    print('generateXml ----   %s  ----',
-          str(datetime.timedelta(seconds=(time.time() - start_time2))))
+    # Количество статей
+    q = int(input('Article quantity: '))
+    collector.getArticles(q)
 
-    print('xml: ', len(os.listdir('files')))
+    print('Collecting Articles: ', str(datetime.timedelta(seconds=(time.time() - start_time))))
+
+    print('Xml: ', len(os.listdir('files')))
