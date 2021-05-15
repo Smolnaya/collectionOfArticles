@@ -7,7 +7,7 @@ from Article import Article
 
 import concurrent.futures
 
-THREAD_QUANTITY = 5
+THREAD_QUANTITY = 1
 URL = 'https://the-geek.ru/category/news'
 
 
@@ -37,7 +37,7 @@ def getArticles(articleNumber):
     for a in aList:
         hrefList.append(a.get_attribute('href'))
 
-    driver.close()
+    driver.quit()
 
     print('Href: ', len(hrefList))
 
@@ -72,8 +72,8 @@ def collectArticles(param, hrefList):
                 source = source[0].text
             else:
                 source = ''
-            for elem in textList:
-                text += elem.text + '\n'
+            for i in range(len(textList) - 1):
+                text += textList[i].text + '\n'
             for elem in tagList:
                 tags += elem.text + '\n'
             article = Article(title, date, author, text.strip(), tags.strip(), source)
@@ -82,4 +82,4 @@ def collectArticles(param, hrefList):
             print(err)
             pass
 
-    driver.close()
+    driver.quit()
