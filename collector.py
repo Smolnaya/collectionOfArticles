@@ -67,15 +67,14 @@ def collectArticles(param, hrefList):
             source = driver.find_elements_by_xpath("//article/div/div/div/div/div/a")
             tagList = driver.find_elements_by_xpath("//article/div[3]/div[3]/a")
             text = ''
-            tags = ''
             if len(source) > 0:
                 source = source[0].text
             else:
                 source = ''
             for i in range(len(textList) - 1):
                 text += textList[i].text + '\n'
-            for elem in tagList:
-                tags += elem.text + '\n'
+            tagListText = [elem.text for elem in tagList]
+            tags = '\\'.join(tagListText)
             article = Article(title, date, author, text.strip(), tags.strip(), source)
             xmlGenerator.generateXml(article)
         except TimeoutException as err:
