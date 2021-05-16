@@ -1,50 +1,44 @@
 import xml.etree.ElementTree as et
-import service
-import Article
+from xml.dom import minidom
+
+from service import *
 
 
-def generateXml(article: Article):
+def addAttrib(elem, attribList):
+    lst = ['verify', 'type', 'auto']
+    for i in range(len(lst)):
+        elem.attrib[lst[i]] = attribList[i]
+    return elem
+
+
+def createElem(root, namesList, dataLst):
+    for i in range(len(namesList)):
+        elem = et.SubElement(root, namesList[i])
+        if isinstance(dataLst[i], list):
+            elem = addAttrib(elem, ['true', 'list', 'true'])
+            for tagData in dataLst[i]:
+                tag = et.SubElement(elem, 'tag')
+                tag.text = tagData
+        else:
+            if namesList[i] == 'text':
+                elem = addAttrib(elem, ['true', 'cdata', 'true'])
+                elem.text = f"![CDATA[{[dataLst[i]]}]]"
+            elif namesList[i] == 'date':
+                elem = addAttrib(elem, ['true', 'date', 'true'])
+                elem.text = convertDate(dataLst[i])
+            else:
+                elem = addAttrib(elem, ['true', 'text', 'true'])
+                elem.text = dataLst[i]
+    return root
+
+
+def generateXml(article: list):
     root = et.Element('doc')
 
-    sourceElem = et.SubElement(root, 'source')
-    sourceElem.text = article.source
-    sourceElem.attrib['verify'] = "true"
-    sourceElem.attrib['type'] = "str"
-    sourceElem.attrib['auto'] = "true"
+    namesList = ['title', 'date', 'author', 'text', 'tags', 'source', 'href']
+    root = createElem(root, namesList, article)
 
-    # categoryElem = et.SubElement(root, 'category')
+    tree = minidom.parseString(et.tostring(root)).toprettyxml()
 
-    authorElem = et.SubElement(root, 'author')
-    authorElem.text = article.author
-    authorElem.attrib['verify'] = "true"
-    authorElem.attrib['type'] = "str"
-    authorElem.attrib['auto'] = "true"
-
-    titleElem = et.SubElement(root, 'title')
-    titleElem.text = article.title
-    titleElem.attrib['verify'] = "true"
-    titleElem.attrib['type'] = "str"
-    titleElem.attrib['auto'] = "true"
-
-    dateElem = et.SubElement(root, 'date')
-    dateElem.text = service.convertDate(article.date)
-    dateElem.attrib['verify'] = "true"
-    dateElem.attrib['type'] = "date"
-    dateElem.attrib['auto'] = "true"
-
-    tagsElem = et.SubElement(root, 'tags')
-    tagsElem.text = article.tags
-    tagsElem.attrib['verify'] = "true"
-    tagsElem.attrib['type'] = "str"
-    tagsElem.attrib['auto'] = "true"
-
-    textElem = et.SubElement(root, 'text')
-    textElem.text = f"![CDATA[{article.text}]]"
-    textElem.attrib['verify'] = "true"
-    textElem.attrib['type'] = "str"
-    textElem.attrib['auto'] = "true"
-
-    tree = et.ElementTree(root)
-
-    with open(f'files/{service.titleToFileName(article.title)}.xml', "wb") as files:
-        tree.write(files, encoding='UTF-8', xml_declaration=True)
+    with open(f'files/{titleToFileName(article[0])}.xml', "wb") as file:
+        file.write(tree.encode('UTF-8'))
